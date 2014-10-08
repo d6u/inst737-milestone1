@@ -1,7 +1,7 @@
 require 'csv'
 require 'time'
 
-ONE_HOUR = 60 * 60
+TIME_INTERVAL = 60 * 10
 
 targets = [
   517101582534852608, 517101577631694848, 517101563438178305,
@@ -12,19 +12,19 @@ targets.each do |id|
 
   summary = []
   time = Time.parse table[0][:created_at]
-  current = {time: (time + ONE_HOUR / 2).to_s, count: 0}
+  current = {time: (time + TIME_INTERVAL / 2).to_s, count: 0}
 
   table.each_with_index do |row, i|
     next if i == 0
 
     t = Time.parse row[:created_at]
 
-    if t - time <= ONE_HOUR
+    if t - time <= TIME_INTERVAL
       current[:count] += 1
     else
-      time += ONE_HOUR
+      time += TIME_INTERVAL
       summary << current
-      current = {time: time + ONE_HOUR / 2, count: 1}
+      current = {time: time + TIME_INTERVAL / 2, count: 1}
     end
 
   end

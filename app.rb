@@ -16,14 +16,20 @@ targets = [517101582534852608, 517101577631694848, 517101563438178305,
   517101561269723137, 517101546111533056, 517101437713932289]
 
 targets.each do |id|
-  arr = ([$client.status(id)] + $client.retweets(id, count: 100)).sort do |a, b|
+  tweet = $client.status(id)
+
+  headers = tweet.attrs.map {|k, v| k}
+
+  arr = ([tweet] + $client.retweets(id, count: 100)).sort do |a, b|
     Time.parse(a.attrs[:created_at]) <=> Time.parse(b.attrs[:created_at])
   end
 
   CSV.open("./retweets_of_#{id}_new.csv", 'w') do |csv|
-    csv << arr[0].to_h.map {|key, val| key.to_s}
+    csv << headers
     arr.each do |tweet|
-      csv << tweet.to_h.map {|key, val| val.class == Hash ? nil : val.to_s}
+      csv << tweet.attrs
+        .select {|key, val| headers.include? key}
+        .map {|key, val| val.class == Hash ? nil : val.to_s}
     end
   end
 end
