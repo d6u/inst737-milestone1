@@ -33,7 +33,7 @@ targets.each do |id|
 
   CSV.open("summary_of_#{id}.csv", 'w') do |csv|
     csv << summary[0].map {|key, val| key}
-    csv << [Time.parse(table[0][:created_at])]
+    csv << [Time.parse(table[0][:created_at]), nil]
     summary.each do |row|
       csv << row.map {|key, val| val}
     end
