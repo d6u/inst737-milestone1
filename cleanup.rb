@@ -8,17 +8,19 @@ targets = [
   517101561269723137, 517101546111533056, 517101437713932289]
 
 targets.each do |id|
-  table = CSV.table "retweets_of_#{id}_new.csv"
+  table = CSV.table "retweets_of_#{id}_new.csv" # Load data file
 
   summary = []
   time = Time.parse table[0][:created_at]
   current = {time: (time + TIME_INTERVAL / 2).to_s, count: 0, min_since_create: TIME_INTERVAL / 60}
 
   table.each_with_index do |row, i|
-    next if i == 0
+    next if i == 0 # Skip original tweets
 
     t = Time.parse row[:created_at]
 
+    # If a tweet is within current time interval, we increment the count by 1
+    # If not, we more forward to next time interval and recheck
     if t - time <= TIME_INTERVAL
       current[:count] += 1
     else
@@ -33,6 +35,7 @@ targets.each do |id|
 
   summary << current
 
+  # Write summary into summary CSV file
   CSV.open("summary_of_#{id}.csv", 'w') do |csv|
     csv << summary[0].map {|key, val| key}
     csv << [Time.parse(table[0][:created_at]), nil, 0]
