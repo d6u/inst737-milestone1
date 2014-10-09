@@ -1,7 +1,7 @@
 require 'csv'
 require 'time'
 
-TIME_INTERVAL = 60 * 10
+TIME_INTERVAL = 60 * 2
 
 targets = [
   517101582534852608, 517101577631694848, 517101563438178305,
@@ -12,7 +12,7 @@ targets.each do |id|
 
   summary = []
   time = Time.parse table[0][:created_at]
-  current = {time: (time + TIME_INTERVAL / 2).to_s, count: 0}
+  current = {time: (time + TIME_INTERVAL / 2).to_s, count: 0, min_since_create: TIME_INTERVAL / 60}
 
   table.each_with_index do |row, i|
     next if i == 0
@@ -24,7 +24,9 @@ targets.each do |id|
     else
       time += TIME_INTERVAL
       summary << current
-      current = {time: time + TIME_INTERVAL / 2, count: 1}
+      current = {time: time + TIME_INTERVAL / 2, count: 0,
+        min_since_create: current[:min_since_create] + TIME_INTERVAL / 2}
+      redo
     end
 
   end
@@ -33,7 +35,7 @@ targets.each do |id|
 
   CSV.open("summary_of_#{id}.csv", 'w') do |csv|
     csv << summary[0].map {|key, val| key}
-    csv << [Time.parse(table[0][:created_at]), nil]
+    csv << [Time.parse(table[0][:created_at]), nil, 0]
     summary.each do |row|
       csv << row.map {|key, val| val}
     end
