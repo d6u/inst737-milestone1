@@ -25,7 +25,7 @@ targets.each do |id|
       time += TIME_INTERVAL
       summary << current
       current = {time: time + TIME_INTERVAL / 2, count: 0,
-        min_since_create: current[:min_since_create] + TIME_INTERVAL / 2}
+        min_since_create: current[:min_since_create] + TIME_INTERVAL / 60}
       redo
     end
 
